@@ -25,3 +25,74 @@ exports.PostNoted = (req, res) => {
     res.status(201).json({ id: results.insertId, title });
   });
 };
+
+
+
+
+
+exports.GetId = (req, res) => {
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(400).json({ error: 'ID is required' });
+  }
+
+  connection.query('SELECT * FROM notes WHERE id = ?', [id], (error, results) => {
+    if (error) {
+      console.error('Database query error:', error);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Data not found' });
+    }
+
+    return res.status(200).json(results[0]);
+  });
+}
+
+exports.Delete = (req, res) => {
+  const { id } = req.params;
+
+  const query = 'DELETE FROM notes WHERE id = ?';
+  
+  // Gunakan array [id] sebagai parameter dalam connection.query
+  connection.query(query, [id], (error, results) => {
+    if (error) {
+      console.error('Database query error:', error);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+    
+    // Periksa apakah results.affectedRows === 0 untuk menentukan jika data tidak ditemukan
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Data not found' });
+    }
+    
+    // Jika berhasil menghapus data
+    return res.status(200).json({ message: 'Data deleted successfully' });
+  });
+};
+
+
+exports.Update = (req, res) => {
+  const { id } = req.params;
+  const { title, datetime, note } = req.body;
+
+  const query = 'UPDATE notes SET title = ?, datetime = ?, note = ? WHERE id = ?';
+  const values = [title, datetime, note, id];
+
+  connection.query(query, values, (error, results) => {
+    if (error) {
+      console.error('Database query error:', error);
+      return res.status(500).json({ error: 'Database query error perhatikan Format tanggal dan waktu pada datetime' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Data not found' });
+    }
+
+    return res.status(200).json({ message: 'Data updated successfully' });
+  });
+  
+};
+
