@@ -59,19 +59,16 @@ exports.Delete = (req, res) => {
 
   const query = 'DELETE FROM notes WHERE id = ?';
   
-  // Gunakan array [id] sebagai parameter dalam connection.query
   connection.query(query, [id], (error, results) => {
     if (error) {
       console.error('Database query error:', error);
       return res.status(500).json({ error: 'Database query error' });
     }
     
-    // Periksa apakah results.affectedRows === 0 untuk menentukan jika data tidak ditemukan
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Data not found' });
     }
     
-    // Jika berhasil menghapus data
     return res.status(200).json({ message: 'Data deleted successfully' });
   });
 };
