@@ -12,19 +12,22 @@ exports.getNoted = (req, res) => {
 };
 
 exports.PostNoted = (req, res) => {
-  const { title, datetime, note } = req.body;
+  const { title, note } = req.body;
+
+  const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   const query = 'INSERT INTO notes (title, datetime, note) VALUES (?, ?, ?)';
   const values = [title, datetime, note];
 
   connection.query(query, values, (err, results) => {
     if (err) {
-      console.error('Error creating example:', err);
+      console.error('Error creating note:', err);
       return res.status(500).json({ error: 'Database error' });
     }
-    res.status(201).json({ id: results.insertId, title });
+    res.status(201).json({ id: results.insertId, title, datetime, note });
   });
 };
+
 
 
 
